@@ -1,26 +1,34 @@
 package com.example.instagramclone.data
 
+import androidx.paging.Pager
+import androidx.paging.PagingConfig
+import androidx.paging.PagingData
+import androidx.paging.map
 import com.example.instagramclone.model.Post
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.firstOrNull
-import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.onStart
+import kotlinx.coroutines.flow.map
 
 class PostRepository(
-    private val api: PostApi,
+    private val apiService: ApiService,
     private val postDao: PostDao
 ) {
 
-    fun getPosts(): Flow<List<Post>> = flow {
-        try {
-            val response = api.getPosts()
-            postDao.clearPosts()
-            postDao.insertPost(response)
-            emit(response)
-        } catch (e: Exception) {
-            emit(postDao.getPosts().firstOrNull() ?: emptyList<Post>())
+    fun getPosts(): Flow<PagingData<Post>> {
+        return Pager(
+            config = PagingConfig(pageSize = 10),
+            pagingSourceFactory = {
+                postDao.getPosts()
+            }
+        ).flow.map { pagingData ->
+            pagingData.map { post ->
+                post
+            }
         }
-    }.onStart {
-        emit(postDao.getPosts().firstOrNull() ?: emptyList<Post>())
     }
+
+    suspend fun refreshPosts() {
+        val remotePosts = apiService.getPosts()
+        postDao.insertPost(remotePosts)
+    }
+
 }

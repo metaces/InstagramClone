@@ -61,6 +61,8 @@ dependencies {
     implementation(libs.android.coroutine.android)
     implementation(libs.android.navigation.compose)
     implementation(libs.android.coil.compose)
+    implementation(libs.android.paging.runtime)
+    implementation(libs.android.paging.compose)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

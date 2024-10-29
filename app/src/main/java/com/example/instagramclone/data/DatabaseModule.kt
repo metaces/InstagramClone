@@ -12,6 +12,10 @@ object DatabaseModule {
         ).build()
     }
 
+    fun providePostDao(database: PostDatabase): PostDao {
+        return database.postDao()
+    }
+
     fun providePostRepository(context: Context): PostRepository {
         val database = provideDatabase(context)
         return PostRepository(RetrofitInstance.api, database.postDao())
